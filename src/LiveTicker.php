@@ -8,6 +8,7 @@ class LiveTicker
         add_action('init', array($this, 'create_post_type'));
         add_action('init', array($this, 'register_ticker_taxonomy'));
         add_action('admin_notices', array($this, 'modify_admin_screen'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_filter('wp_insert_post_data', array($this, 'add_default_title'), 10, 2);
     }
 
@@ -35,11 +36,19 @@ class LiveTicker
         );
     }
 
+    public function enqueue_scripts($hook)
+    {
+        $screen = get_current_screen();
+        if (($hook === 'edit.php' || $hook === 'post-new.php') && $screen->post_type === 'livetick') {
+            wp_enqueue_script('livetickeradmin', REVINFRASTRUCT_LIVETICKER_URL.'/dist/livetickeradmin.js');
+        }
+    }
+
     public function register_ticker_taxonomy()
     {
-        register_taxonomy('liveticker', 'livetick',
+        register_taxonomy('tickevents', 'livetick',
             array(
-                'label' => __('Tickers', 'revinfrastruct'),
+                'label' => __('Events', 'revinfrastruct'),
                 'show_admin_column' => true,
                 'hierarchical' => true
             )
@@ -49,8 +58,9 @@ class LiveTicker
     public function modify_admin_screen()
     {
         $current_screen = get_current_screen();
-        if ('livetick' == $current_screen->post_type && 'edit' == $current_screen->base) {
-            $tickers = get_terms('liveticker', array(
+        if ($current_screen->post_type === 'livetick'
+            && $current_screen->base === 'edit') {
+            $tickers = get_terms('tickevents', array(
                 'hide_empty' => false,
             ));
             include_once REVINFRASTRUCT_LIVETICKER_PATH.'src/templates/active-tickers.php';
