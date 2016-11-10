@@ -22,7 +22,8 @@ class LiveTicker
                 ),
                 'supports'          => array(
                     'editor',
-                    'categories'
+                    'categories',
+                    'thumbnail'
                 ),
                 'name_admin_bar'        => __('Liveticker', 'revinfrastruct'),
                 'menu_icon'             => 'dashicons-megaphone',
